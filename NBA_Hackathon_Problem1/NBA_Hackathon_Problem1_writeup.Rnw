@@ -1,0 +1,144 @@
+\documentclass{article}
+%packages
+\usepackage[sc]{mathpazo}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2.5cm,bmargin=2.5cm,lmargin=2.5cm,rmargin=2.5cm}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{url}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=2,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\hypersetup{pdfstartview={XYZ null null 1}}
+\usepackage{breakurl}
+\usepackage{/Users/zeyu/Dropbox/misc/academic_misc/LATEX/mylecstyles}
+
+\begin{document}
+
+<<setup, include=FALSE, cache=FALSE>>=
+library(knitr)
+# set global chunk options
+opts_chunk$set(fig.path='figure/minimal-', qig.align='center', fig.show='hold', 
+               echo = FALSE, include = FALSE)
+options(formatR.arrow=TRUE,width=90)
+# other libraries
+@
+
+\title{NBA Hackathon Problem 1}
+\author{Chia-Wei Hsu, Zeyu Li}
+\maketitle
+
+\section*{(a)}
+\section*{Approach 1: Exact answer}
+<<exact-answer>>=
+no_closs <- function(win){
+  ans <- choose((win + 1), (82 - win) ) * 0.8^win * 0.2^(82 - win)
+  return(ans)
+}
+### Probability of no 2 consecutive losses
+x <- sum(sapply(41:82, no_closs))
+@
+    
+The exact probability that the Warriors would never lose consecutive games at any
+point during an 82-game season is as follows, 
+
+\begin{equation*}
+    \sum_{x = 41}^{82}\binom{x+1}{82-x}0.8^x0.2^{82-x}
+\end{equation*}
+
+Above sum is approximately \Sexpr{x}.
+
+\section*{Approach 2: Simulation}
+
+<<simulation>>=
+# function for simulating 1000 samples of 82-game seasons 
+season_simulation <- function(n = 1000){
+    # simulate 1000 82-game seasons
+    sample <- 100     
+    # create a container for storing experiment outcomes
+    container <- matrix(NA, ncol = sample, nrow = n) 
+    
+    for(j in 1:n){
+        for(i in 1:sample){
+            # set-up
+            sample.space <- c(0,1) # win -- 1; loss -- 0
+            theta <- 0.8 # Warriors have 80% chance of winning each game
+            N <- 82 # 82 games
+            # Similar to biased coin flips
+            flips <- rbinom(n = N, size = 1, prob = theta)
+            # next check for consecutive losses (consecutive 0s)
+            r0 <- rle(flips) # list running lengths 
+            x <- r0$length[r0$values == 0] # count running length of 0s
+            boo <- sum(x != 1) == 0 # consecutive occurrence of 0 or not; 
+            # FALSE : there are consecutive loss in a simulated 82-game season
+            # TRUE : there are no consecutive loss in a simulated 82-game season
+            container[j,i] <- boo
+        }
+    }
+    
+    return(container)
+}
+
+# (a)
+set.seed(123456789) # set starting point
+sim <- season_simulation(n = 1000)
+y <- rowSums(sim)/ncol(sim) # Prob(no consecutive losses)
+p <- mean(y)
+se <- sd(y)
+
+# (b)
+upp <- mean(y) + 1.96 * sd(y)/sqrt(100)
+low <- mean(y) - 1.96 * sd(y)/sqrt(100)
+upp_per <- upp*100
+low_per <- low*100
+# null hypothesis: Prob(no consecutive losses) = 1
+# since null hypothesis is not in the confidence interval, reject null
+
+# (c)
+# At least game win percentage
+least_per <- function(percentage){
+  ans <- 0
+  for(i in 41 :82){
+    ans <- ans + choose((i + 1), (82 - i) ) * percentage^i * 
+           (1-percentage)^(82-i)
+  }
+  ans - 0.5
+}
+z <- uniroot(least_per,c(0,1))
+z <- z$root
+z_per <- z*100
+### At least winning percentage 
+#0.903776165, this is tested by a lot of numbers to get different answer from
+#the uniroot function
+@
+
+(Note: code for simulation see separate attached file). We build a simulator
+that simulates many 82-game seasons. Each 82-game season is binomially
+distributed with a success probability of 0.8 ($p = 0.8$) and a failure
+probability of 0.2 ($q = 1 - p = 0.2$). We draw random samples of size 100 from
+the binomial distribution and count the number of samples where the Warriors
+does not lose consecutive games at any point in a given 82-game season. This way
+we obtain an approximated probability. We repeat this process $n$ times (we
+choose $n$ to be $1000$ to ensure that law of large numbers applies). After
+repeating for $1000$ times, we obtain an averaged probability of \Sexpr{p} and a
+standard error (variability) of \Sexpr{se}. We are $95\%$ confidence that the
+true probability lies within the interval $(\Sexpr{low}, \ \Sexpr{upp})$.
+@
+
+\section*{(b)}
+The null hypothesis is that the Warriors would never lose consecutive games at
+any point during an 82-game season, that is $\Prob(no\ consecutive\ losses) =
+100\%$. From above simulations, we can calculate a $95\%$ confidence interval,
+which is $(\Sexpr{low_per}\%, \ \Sexpr{upp_per}\%)$. Since it does not contain
+$100\%$, we reject the null hypothesis. 
+
+
+\section*{(c)}
+This question is easy to derive from the exact solution in the form presented in
+(a). The answer is calculated to be $\Sexpr{z_per}\%$.
+
+
+\end{document}
+

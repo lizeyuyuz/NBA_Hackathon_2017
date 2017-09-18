@@ -1,0 +1,68 @@
+\documentclass[12pt]{report}
+\usepackage[fleqn]{amsmath} %left align
+\usepackage{/Users/zeyu/Dropbox/misc/academic_misc/LATEX/mylecstyles}
+\begin{document}
+\section*{Problem 2 (a)}
+    N = 4 : H H A A 
+\begin{align*}
+    \Prob(N=4) 
+    &= 
+    %east1 wins HHAA
+    \underbrace{p_H^2 p_A^2}_{\text{east1 wins 4 games}} +
+    %east8 wins HHAA
+    \underbrace{(1-p_H)^2 (1-p_A)^2}_{\text{east8 wins 4 games}} 
+\end{align*}
+    N = 5 : H H A A H 
+\begin{align*}
+    \Prob(N=5) 
+    &= 
+    %east1 
+    \underbrace{\binom{2}{1}(1-p_H) p_H^2 p_A^2}_{\text{east1 loses 1 Home}} + 
+    \underbrace{\binom{2}{1}(1-p_A) p_H^3 p_A}_{\text{east1
+    loses 1 Away}} \\ 
+    %east8
+    &+ 
+    \underbrace{\binom{2}{1}p_H(1-p_H)^2(1-p_A)^2}_{\text{east8 loses 1 Home}} +
+    \underbrace{\binom{2}{1}p_A (1-p_H)^3 (1-p_A)}_{\text{east8 loses 1 Away}}
+\end{align*}
+
+    N = 6 : H H A A H A 
+\begin{align*}
+    \Prob(N=6) 
+    &= 
+    \underbrace{\binom{3}{2}(1-p_H)^2 p_H p_A^3}_{\text{east1 loses 2 Home}} + 
+    \underbrace{(1-p_A)^2 p_H^3 p_A}_{\text{east1 loses 2 Away}}+
+    \underbrace{\binom{3}{1}\binom{2}{1} (1-p_H)(1-p_A) p_H^2
+        p_A^2}_{\text{east1 loses 1 Home 1 Away}} \\ 
+    &+ 
+    \underbrace{\binom{3}{2}p_H^2 (1-p_H)(1- p_A)^3}_{\text{east8 loses 2 Home}}
+    +
+    \underbrace{p_A^2 (1-p_H)^3 (1-p_A)}_{\text{east8 loses 2
+            Away}} \\
+    &+
+    \underbrace{\binom{3}{1}\binom{2}{1} p_H p_A (1-p_H)^2
+            (1-p_A)^2}_{\text{east8 loses 1 Home 1 Away}} 
+\end{align*}
+    N = 7 : H H A A H A H 
+\begin{align*}
+    \Prob(N=7) 
+    &= 
+    \underbrace{(1-p_H)^3 p_H p_A^3}_{\text{east1 loses 3
+    Home}} + 
+    \underbrace{(1-p_A)^3p_H^4}_{\text{east1 loses 3 Away}}\\
+    &+ 
+    \underbrace{\binom{3}{1}\binom{3}{1} (1- p_H)^2(1-p_A)
+        p_H^2 p_A^2}_{\text{east1 loses 2 Home 1 Away}} +
+        \underbrace{\binom{3}{1}\binom{3}{1}(1-p_H)(1-p_A)^2 p_H^3
+        p_A}_{\text{east1 loses 1 Home 2 Away}} \\
+    &+
+    \underbrace{p_H^3 (1-p_H)(1- p_A)^3}_{\text{east8 loses 3
+    Home}} + 
+    \underbrace{p_A^3(1-p_H)^4}_{\text{east8 loses 3 Away}}\\
+    &+ 
+    \underbrace{\binom{3}{1}\binom{3}{1} p_H^2 p_A
+    (1-p_H)^2 (1-p_A)^2}_{\text{east8 loses 2 Home 1 Away}} +
+    \underbrace{\binom{3}{1}\binom{3}{1}p_H p_A^2 (1-p_H)^3
+    (1-p_A)}_{\text{east8 loses 1 Home 2 Away}} \\
+\end{align*}
+\end{document}

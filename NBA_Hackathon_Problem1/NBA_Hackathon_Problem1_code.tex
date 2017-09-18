@@ -1,0 +1,242 @@
+\documentclass{article}\usepackage[]{graphicx}\usepackage[]{color}
+%% maxwidth is the original width if it is less than linewidth
+%% otherwise use linewidth (to make sure the graphics do not exceed the margin)
+\makeatletter
+\def\maxwidth{ %
+  \ifdim\Gin@nat@width>\linewidth
+    \linewidth
+  \else
+    \Gin@nat@width
+  \fi
+}
+\makeatother
+
+\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
+\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
+\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
+\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
+\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
+\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
+\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
+\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
+\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
+\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
+\let\hlipl\hlkwb
+
+\usepackage{framed}
+\makeatletter
+\newenvironment{kframe}{%
+ \def\at@end@of@kframe{}%
+ \ifinner\ifhmode%
+  \def\at@end@of@kframe{\end{minipage}}%
+  \begin{minipage}{\columnwidth}%
+ \fi\fi%
+ \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
+ \colorbox{shadecolor}{##1}\hskip-\fboxsep
+     % There is no \\@totalrightmargin, so:
+     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
+ \MakeFramed {\advance\hsize-\width
+   \@totalleftmargin\z@ \linewidth\hsize
+   \@setminipage}}%
+ {\par\unskip\endMakeFramed%
+ \at@end@of@kframe}
+\makeatother
+
+\definecolor{shadecolor}{rgb}{.97, .97, .97}
+\definecolor{messagecolor}{rgb}{0, 0, 0}
+\definecolor{warningcolor}{rgb}{1, 0, 1}
+\definecolor{errorcolor}{rgb}{1, 0, 0}
+\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+
+\usepackage{alltt}
+%packages
+\usepackage[sc]{mathpazo}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{verbose,tmargin=2.5cm,bmargin=2.5cm,lmargin=2.5cm,rmargin=2.5cm}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\usepackage{url}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=true,bookmarksopen=true,bookmarksopenlevel=2,
+ breaklinks=false,pdfborder={0 0 1},backref=false,colorlinks=false]
+ {hyperref}
+\hypersetup{pdfstartview={XYZ null null 1}}
+\usepackage{breakurl}
+\usepackage{/Users/zeyu/Dropbox/misc/academic_misc/LATEX/mylecstyles}
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\begin{document}
+
+
+
+\title{NBA Hackathon Problem 1}
+\author{Chia-Wei Hsu, Zeyu Li}
+\maketitle
+
+\section*{(a)}
+\section*{Approach 1: Exact answer}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{no_closs} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{win}\hlstd{)\{}
+  \hlstd{ans} \hlkwb{<-} \hlkwd{choose}\hlstd{((win} \hlopt{+} \hlnum{1}\hlstd{), (}\hlnum{82} \hlopt{-} \hlstd{win) )} \hlopt{*} \hlnum{0.8}\hlopt{^}\hlstd{win} \hlopt{*} \hlnum{0.2}\hlopt{^}\hlstd{(}\hlnum{82} \hlopt{-} \hlstd{win)}
+
+  \hlkwd{return}\hlstd{(ans)}
+\hlstd{\}}
+\hlcom{### Probability of no 2 consecutive losses}
+\hlstd{x} \hlkwb{<-} \hlkwd{sum}\hlstd{(}\hlkwd{sapply}\hlstd{(}\hlnum{41}\hlopt{:}\hlnum{82}\hlstd{, no_closs))}
+\hlstd{x}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.05881686
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+    
+The exact probability that the Warriors would never lose consecutive games at any
+point during an 82-game season is as follows, 
+
+\begin{equation*}
+    \sum_{x = 41}^{82}\binom{x+1}{82-x}0.8^x0.2^{82-x}
+\end{equation*}
+
+Above sum is approximately 0.0588169.
+
+\section*{Approach 2: Simulation}
+
+Below code chunk is the function that repeats n times of simulating 900 samples of
+82-game seasons.
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlstd{season_simulation} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{n} \hlstd{=} \hlnum{1000}\hlstd{)\{}
+    \hlcom{# simulate 900 82-game seasons}
+    \hlstd{sample} \hlkwb{<-} \hlnum{900}
+    \hlcom{# create a container for storing experiment outcomes}
+    \hlstd{container} \hlkwb{<-} \hlkwd{matrix}\hlstd{(}\hlnum{NA}\hlstd{,} \hlkwc{ncol} \hlstd{= sample,} \hlkwc{nrow} \hlstd{= n)}
+
+    \hlkwa{for}\hlstd{(j} \hlkwa{in} \hlnum{1}\hlopt{:}\hlstd{n)\{}
+        \hlkwa{for}\hlstd{(i} \hlkwa{in} \hlnum{1}\hlopt{:}\hlstd{sample)\{}
+            \hlcom{# set-up}
+            \hlstd{sample.space} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{)} \hlcom{# win -- 1; loss -- 0}
+            \hlstd{theta} \hlkwb{<-} \hlnum{0.8} \hlcom{# Warriors have 80% chance of winning each game}
+            \hlstd{N} \hlkwb{<-} \hlnum{82} \hlcom{# 82 games}
+            \hlcom{# Similar to biased coin flips}
+            \hlstd{flips} \hlkwb{<-} \hlkwd{rbinom}\hlstd{(}\hlkwc{n} \hlstd{= N,} \hlkwc{size} \hlstd{=} \hlnum{1}\hlstd{,} \hlkwc{prob} \hlstd{= theta)}
+            \hlcom{# next check for consecutive losses (consecutive 0s)}
+            \hlstd{r0} \hlkwb{<-} \hlkwd{rle}\hlstd{(flips)} \hlcom{# list running lengths }
+            \hlstd{x} \hlkwb{<-} \hlstd{r0}\hlopt{$}\hlstd{length[r0}\hlopt{$}\hlstd{values} \hlopt{==} \hlnum{0}\hlstd{]} \hlcom{# count running length of 0s}
+            \hlstd{boo} \hlkwb{<-} \hlkwd{sum}\hlstd{(x} \hlopt{!=} \hlnum{1}\hlstd{)} \hlopt{==} \hlnum{0} \hlcom{# consecutive occurrence of 0 or not; }
+            \hlcom{# FALSE : there are consecutive loss in a simulated 82-game season}
+            \hlcom{# TRUE : there are no consecutive loss in a simulated 82-game season}
+            \hlstd{container[j,i]} \hlkwb{<-} \hlstd{boo}
+        \hlstd{\}}
+    \hlstd{\}}
+
+    \hlkwd{return}\hlstd{(container)}
+\hlstd{\}}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+Repeat the process for 1000 times. 
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# (a)}
+\hlkwd{set.seed}\hlstd{(}\hlnum{123456789}\hlstd{)} \hlcom{# set starting point}
+\hlstd{sim} \hlkwb{<-} \hlkwd{season_simulation}\hlstd{(}\hlkwc{n} \hlstd{=} \hlnum{1000}\hlstd{)}
+\hlstd{y} \hlkwb{<-} \hlkwd{rowSums}\hlstd{(sim)}\hlopt{/}\hlkwd{ncol}\hlstd{(sim)} \hlcom{# Prob(no consecutive losses)}
+\hlstd{p} \hlkwb{<-} \hlkwd{mean}\hlstd{(y)}
+\hlstd{se} \hlkwb{<-} \hlkwd{sd}\hlstd{(y)}\hlopt{/}\hlkwd{sqrt}\hlstd{(}\hlnum{900}\hlstd{)}
+\hlstd{p}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.05891111
+\end{verbatim}
+\begin{alltt}
+\hlstd{se}
+\end{alltt}
+\begin{verbatim}
+## [1] 0.0002582845
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlkwd{hist}\hlstd{(y,}
+     \hlkwc{main} \hlstd{=} \hlstr{"Histogram of the simulated probabilities"}\hlstd{,}
+     \hlkwc{xlab} \hlstd{=} \hlstr{"Prob(Warriors does not lose consecutive games 
+     at any point in an game season)"}\hlstd{)}
+\end{alltt}
+\end{kframe}
+\includegraphics[width=5in,height=4.5in]{figure/minimal-simulation_plot-1} 
+
+\end{knitrout}
+
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# 95% confidence interval}
+\hlstd{upp} \hlkwb{<-} \hlstd{p} \hlopt{+} \hlnum{1.96} \hlopt{*} \hlstd{se}
+\hlstd{low} \hlkwb{<-} \hlstd{p} \hlopt{-} \hlnum{1.96} \hlopt{*} \hlstd{se}
+\hlstd{upp_per} \hlkwb{<-} \hlstd{upp}\hlopt{*}\hlnum{100}
+\hlstd{low_per} \hlkwb{<-} \hlstd{low}\hlopt{*}\hlnum{100}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+(Note: code for simulation see separate attached file). We build a simulator
+that simulates many 82-game seasons. Each 82-game season is binomially
+distributed with a success probability of 0.8 ($p = 0.8$) and a failure
+probability of 0.2 ($q = 1 - p = 0.2$). We draw random samples of size 900 from
+the binomial distribution and count the number of samples where the Warriors
+does not lose consecutive games at any point in a given 82-game season. This way
+we obtain an approximated probability. We repeat this process $n$ times (we
+choose $n$ to be $1000$ to ensure that law of large numbers applies). After
+repeating for $1000$ times, we obtain an averaged probability of 0.0589111 and a
+standard error (variability) of \ensuremath{2.582845\times 10^{-4}}. We are $95\%$ confidence that the
+true probability lies within the interval $(0.0584049, \ 0.0594173)$.
+
+
+\section*{(b)}
+The null hypothesis is that the Warriors would never lose consecutive games at
+any point during an 82-game season, that is $\Prob(no\ consecutive\ losses) =
+100\%$. From above simulations, we can calculate a $95\%$ confidence interval,
+which is $(5.8404873\%, \ 5.9417349\%)$. Since it does not contain
+$100\%$, we reject the null hypothesis. 
+
+
+\section*{(c)}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{# (c)}
+\hlcom{# At least game win percentage}
+\hlstd{least_per} \hlkwb{<-} \hlkwa{function}\hlstd{(}\hlkwc{percentage}\hlstd{)\{}
+  \hlstd{ans} \hlkwb{<-} \hlnum{0}
+  \hlkwa{for}\hlstd{(i} \hlkwa{in} \hlnum{41} \hlopt{:}\hlnum{82}\hlstd{)\{}
+    \hlstd{ans} \hlkwb{<-} \hlstd{ans} \hlopt{+} \hlkwd{choose}\hlstd{((i} \hlopt{+} \hlnum{1}\hlstd{), (}\hlnum{82} \hlopt{-} \hlstd{i) )} \hlopt{*} \hlstd{percentage}\hlopt{^}\hlstd{i} \hlopt{*}
+           \hlstd{(}\hlnum{1}\hlopt{-}\hlstd{percentage)}\hlopt{^}\hlstd{(}\hlnum{82}\hlopt{-}\hlstd{i)}
+  \hlstd{\}}
+  \hlstd{ans} \hlopt{-} \hlnum{0.5}
+\hlstd{\}}
+\hlstd{z} \hlkwb{<-} \hlkwd{uniroot}\hlstd{(least_per,}\hlkwd{c}\hlstd{(}\hlnum{0}\hlstd{,}\hlnum{1}\hlstd{))}
+\hlstd{z} \hlkwb{<-} \hlstd{z}\hlopt{$}\hlstd{root}
+\hlstd{z_per} \hlkwb{<-} \hlstd{z}\hlopt{*}\hlnum{100}
+\hlcom{### At least winning percentage }
+\hlcom{#0.903776165, this is tested by a lot of numbers to get different answer from}
+\hlcom{#the uniroot function}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+This question is easy to derive from the exact solution in the form presented in
+(a). The answer is calculated to be $90.3772241\%$.
+
+
+\end{document}
+
+
